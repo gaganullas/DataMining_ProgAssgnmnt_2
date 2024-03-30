@@ -37,7 +37,7 @@ def data_index_function(data, I, J):
 
     min_distance = np.min(distances)
     
-    return min_distancene
+    return min_distance
 
 
 def compute():
