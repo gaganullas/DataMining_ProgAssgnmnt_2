@@ -40,16 +40,15 @@ def fit_kmeans(dataset, n_clusters):
     
     data, labels = dataset
     
-    # Standardize the data
     scaler = StandardScaler()
     data_scaled = scaler.fit_transform(data)
     
-    # Fit KMeans clustering
     kmeans = KMeans(n_clusters=n_clusters, init='random', random_state=42)
-    kmeans.fit(data_scaled)
+    kmeans.fit(data_scaled,labels)
     
-    # Return predicted labels
-    return kmeans.labels_
+    pred_labels = kmeans.predict(data_scaled)
+    
+    return pred_labels
 
 
 def compute():
@@ -150,19 +149,61 @@ def compute():
             pdf.savefig(page)
 
     #dct = answers["1C: cluster successes"] = {"xy": [3,4], "zx": [2]} 
-    dct = answers["1C: cluster successes"] = {"bvv": [3], "add": [3],"b":[3]} 
+    dct = answers["1C: cluster successes"] = {"bvv": [2,3], "add": [2,3],"b":[2,3]} 
 
     # dct value: return a list of 0 or more dataset abbreviations (list has zero or more elements, 
     # which are abbreviated dataset names as strings)
     # dct = answers["1C: cluster failures"] = ["xy"]
-    dct = answers["1C: cluster failures"] = {"nc","nm"} 
+    dct = answers["1C: cluster failures"] = ["nc","nm"]
 
     """
     D. Repeat 1.C a few times and comment on which (if any) datasets seem to be sensitive to the choice of initialization for the k=2,3 cases. You do not need to add the additional plots to your report.
 
     Create a pdf of the plots and return in your report. 
     """
-
+    
+    given_datasets = {
+        "nc": nc,
+        "nm": nm,
+        "bvv": bvv,
+        "add": add,
+        "b": b
+        }
+        
+    num_clusters = [2, 3, 5, 10]
+    dataset_keys = ['nc', 'nm', 'bvv', 'add', 'b']
+ 
+    
+    for iteration in range(3):
+        cluster_successes = {}
+        cluster_failures = []
+        pdf_filename = f"report_1D_{iteration+1}.pdf"
+        pdf_pages = []
+        
+        fig, axes = plt.subplots(len(num_clusters), len(dataset_keys), figsize=(20, 16))
+        fig.suptitle('Scatter plots for different datasets and number of clusters', fontsize=16)
+        
+        for j, dataset_key in enumerate(dataset_keys):
+            data, labels = given_datasets[dataset_key]
+    
+            for i, k in enumerate(num_clusters):
+                predicted_labels = fit_kmeans(given_datasets[dataset_key], n_clusters=k)
+    
+                ax = axes[i, j]
+                ax.scatter(data[:, 0], data[:, 1], c=predicted_labels, cmap='viridis')
+                ax.set_title(f'{dataset_key}, k={k}')
+    
+    
+    
+        plt.tight_layout()
+        pdf_pages.append(fig)
+        plt.close(fig)
+    
+    
+        with PdfPages(pdf_filename) as pdf:
+            for page in pdf_pages:
+                pdf.savefig(page)
+    
     # dct value: list of dataset abbreviations
     # Look at your plots, and return your answers.
     # The plot is part of your report, a pdf file name "report.pdf", in your repository.

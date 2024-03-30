@@ -83,28 +83,15 @@ def compute():
     E.	In the actual algorithm, deciding which clusters to merge should consider all of the available clusters at each iteration. List all the clusters as index sets, using a list of lists, 
     e.g., [{0,1,2},{3,4},{5},{6},…],  that were available when the two clusters in part 2.D were merged.
     """
-    
-    I = {8, 2, 13}
-    J = {1, 9}
-
-    iteration = None
-    for i, row in enumerate(Z):
-        if set(row[:2]) == I or set(row[:2]) == J:
-            iteration = i
-            break
-            
-    clusters = [list(map(int, row[:2])) for row in Z[:iteration]]
-
-    # List the clusters. the [{0,1,2}, {3,4}, {5}, {6}, ...] represents a list of lists.
-    
-    answers["3E: clusters"] = clusters
+      
+    answers["3E: clusters"] = [[4], [6,14],[8,2,13,1,9],[5],[11],[0],[10],[3],[7],[12]]
 
     """
     F.	Single linked clustering is often criticized as producing clusters where “the rich get richer”, that is, where one cluster is continuously merging with all available points. Does your dendrogram illustrate this phenomenon?
     """
 
     # Answer type: string. Insert your explanation as a string.
-    answers["3F: rich get richer"] = "yes"
+    answers["3F: rich get richer"] = "Yes, As we approach the origin, it appears that the clusters tend to merge, resembling the formation of a single cluster composed of all the points in proximity."
 
     return answers
 

@@ -40,18 +40,13 @@ def fit_hierarchical_cluster(dataset, n_clusters, linkage='ward'):
         
     return hierarchical_cluster.labels_
 
-def fit_modified(dataset, cutoff_distance, linkage_method):
-    
+def fit_modified(dataset, distance_threshold, linkage_method):
     data, labels = dataset
     
     scaler = StandardScaler()
     data_scaled = scaler.fit_transform(data)
     
-    Z = scipy_linkage(data_scaled, method=linkage_method)  
-    
-    num_clusters = len(np.where(Z[:, 2] > cutoff_distance)[0]) + 1
-    
-    hierarchical_cluster = AgglomerativeClustering(n_clusters=num_clusters, linkage=linkage_method)
+    hierarchical_cluster = AgglomerativeClustering(n_clusters = None, distance_threshold=distance_threshold, linkage=linkage_method)
     hierarchical_cluster.fit(data_scaled)
     
     return hierarchical_cluster.labels_
@@ -155,23 +150,20 @@ def compute():
     
     Create a pdf of the plots and return in your report. 
     """
-    def calculate_cutoff_distances(datasets, linkage_type):
-    
+    def calculate_distance_threshold(datasets, linkage_type):
+        
         scaler = StandardScaler()
         data_scaled = scaler.fit_transform(datasets)
-        
-        # Calculate linkage matrix
-        Z = linkage(data_scaled, method = linkage_type)
+
+        Z = linkage(data_scaled, method=linkage_type)
         
         merge_distances = np.diff(Z[:, 2])
         
         max_rate_change_idx = np.argmax(merge_distances)
         
-        cutoff_distance = Z[max_rate_change_idx, 2]
+        distance_threshold = Z[max_rate_change_idx, 2]
         
-        cutoff_distances[dataset_key] = cutoff_distance
-        
-        return cutoff_distances
+        return distance_threshold
     
        
     given_datasets = {
@@ -180,41 +172,39 @@ def compute():
         "bvv": bvv,
         "add": add,
         "b": b
-        }
+    }
     
-
     dataset_keys = ['nc', 'nm', 'bvv', 'add', 'b']
     linkage_types = ['single', 'complete', 'ward', 'average']
     pdf_filename = "report_4C.pdf"
     pdf_pages = []
-    cutoff_distances = {}
+    distance_thresholds = {}
     
-
     fig, axes = plt.subplots(len(linkage_types), len(dataset_keys), figsize=(20, 16))
     fig.suptitle('Scatter plots for different datasets and linkage types', fontsize=16)
-
+    
     for i, linkage_type in enumerate(linkage_types):
         for j, dataset_key in enumerate(dataset_keys):
             data, labels = given_datasets[dataset_key]
-        
-            cutoff_distances = calculate_cutoff_distances(data, linkage_type)
-        
-            cutoff_distance = cutoff_distances[dataset_key]
-            predicted_labels = fit_modified(given_datasets[dataset_key] ,cutoff_distance, linkage_type)
-
+            
+            distance_threshold = calculate_distance_threshold(data, linkage_type)
+            distance_thresholds[(dataset_key, linkage_type)] = distance_threshold
+            
+            predicted_labels = fit_modified(given_datasets[dataset_key], distance_threshold, linkage_type)
+    
             ax = axes[i, j]
             ax.scatter(data[:, 0], data[:, 1], c=predicted_labels, cmap='viridis')
             ax.set_title(f'{linkage_type.capitalize()} Linkage\n{dataset_key}')
-
+    
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     pdf_pages.append(fig)
     plt.close(fig)
-
+    
     with PdfPages(pdf_filename) as pdf:
         for page in pdf_pages:
             pdf.savefig(page)
-
-
+    
+    
     # dct is the function described above in 4.C
     dct = answers["4C: modified function"] = fit_modified
 
