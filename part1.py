@@ -222,7 +222,7 @@ def compute():
     # dct value: list of dataset abbreviations
     # Look at your plots, and return your answers.
     # The plot is part of your report, a pdf file name "report.pdf", in your repository.
-    dct = answers["1D: datasets sensitive to initialization"] = ["nc","nm"]
+    dct = answers["1D: datasets sensitive to initialization"] = ["nc"]
 
     return answers
 
