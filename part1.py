@@ -50,6 +50,21 @@ def fit_kmeans(dataset, n_clusters):
     
     return pred_labels
 
+def fit_kmeans_randomseed(dataset, n_clusters,seed):
+    
+    data, labels = dataset
+    
+    scaler = StandardScaler()
+    data_scaled = scaler.fit_transform(data)
+    
+    kmeans = KMeans(n_clusters=n_clusters, init='random', random_state=seed)
+    kmeans.fit(data_scaled,labels)
+    
+    pred_labels = kmeans.predict(data_scaled)
+    
+    return pred_labels
+
+
 
 def compute():
     answers = {}
@@ -149,7 +164,7 @@ def compute():
             pdf.savefig(page)
 
     #dct = answers["1C: cluster successes"] = {"xy": [3,4], "zx": [2]} 
-    dct = answers["1C: cluster successes"] = {"bvv": [2,3], "add": [2,3],"b":[2,3]} 
+    dct = answers["1C: cluster successes"] = {"bvv": [3], "add": [3],"b":[3]} 
 
     # dct value: return a list of 0 or more dataset abbreviations (list has zero or more elements, 
     # which are abbreviated dataset names as strings)
@@ -170,7 +185,7 @@ def compute():
         "b": b
         }
         
-    num_clusters = [2, 3, 5, 10]
+    num_clusters = [2, 3]
     dataset_keys = ['nc', 'nm', 'bvv', 'add', 'b']
  
     
@@ -187,7 +202,7 @@ def compute():
             data, labels = given_datasets[dataset_key]
     
             for i, k in enumerate(num_clusters):
-                predicted_labels = fit_kmeans(given_datasets[dataset_key], n_clusters=k)
+                predicted_labels = fit_kmeans_randomseed(given_datasets[dataset_key], n_clusters=k,seed = iteration)
     
                 ax = axes[i, j]
                 ax.scatter(data[:, 0], data[:, 1], c=predicted_labels, cmap='viridis')
@@ -207,7 +222,7 @@ def compute():
     # dct value: list of dataset abbreviations
     # Look at your plots, and return your answers.
     # The plot is part of your report, a pdf file name "report.pdf", in your repository.
-    dct = answers["1D: datasets sensitive to initialization"] = [""]
+    dct = answers["1D: datasets sensitive to initialization"] = ["nc","nm"]
 
     return answers
 
